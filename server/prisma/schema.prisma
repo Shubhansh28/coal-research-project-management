@@ -36,7 +36,7 @@ model User {
   password String
   role     Role   @default(RESEARCHER)
 
-  projects Project[]
+  assignedProjects Project[] @relation("ProjectResearchers")
 }
 
 model Project {
@@ -50,10 +50,10 @@ model Project {
   endDate     DateTime?
   status      Status      @default(PENDING)
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  reports Report[]
+  researchers User[] @relation("ProjectResearchers")
+  reports     Report[]
+  fundReports FundReport[]
+  documents   Document[]
 }
 
 model Report {
@@ -79,6 +79,7 @@ model FundReport {
   year        Int
 
   projectId String
+  project   Project @relation(fields: [projectId], references: [id])
 }
 
 model Document {
@@ -86,6 +87,7 @@ model Document {
   name      String
   fileUrl   String
   projectId String
+  project   Project @relation(fields: [projectId], references: [id])
 
   createdAt DateTime @default(now())
 }
