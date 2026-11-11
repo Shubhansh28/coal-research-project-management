@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum Role {
+  ADMIN
+  RESEARCHER
+}
+
+enum FundingType {
+  ST
+  RD
+}
+
+enum Status {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+model User {
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
+  role     Role   @default(RESEARCHER)
+
+  projects Project[]
+}
+
+model Project {
+  id          String      @id @default(uuid())
+  title       String
+  projectCode String      @unique
+  description String?
+  fundingType FundingType
+  budget      Float
+  startDate   DateTime?
+  endDate     DateTime?
+  status      Status      @default(PENDING)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  reports Report[]
+}
+
+model Report {
+  id        String   @id @default(uuid())
+  title     String
+  quarter   Int
+  year      Int
+  progress  Int
+  remarks   String?
+  status    Status   @default(PENDING)
+
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model FundReport {
+  id          String   @id @default(uuid())
+  amountSpent Float
+  amountReceived Float
+  quarter     Int
+  year        Int
+
+  projectId String
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  name      String
+  fileUrl   String
+  projectId String
+
+  createdAt DateTime @default(now())
+}
