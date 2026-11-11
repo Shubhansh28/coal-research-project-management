@@ -107,24 +107,8 @@ const me = async (req, res, next) => {
   }
 }
 
-const adminAccess = (req, res) => {
-  res.json({
-    success: true,
-    message: 'Admin route accessed.'
-  })
-}
-
-const researcherAccess = (req, res) => {
-  res.json({
-    success: true,
-    message: 'Researcher route accessed.'
-  })
-}
-
 module.exports = {
-  adminAccess,
   login,
   me,
-  researcherAccess,
   signup
 }
