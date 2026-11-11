@@ -2,12 +2,28 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^18.0.10",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "nodemon": "^3.1.14",
     "pg": "^8.23.1"
   },
   "devDependencies": {
     "@types/pg": "^8.23.1",
     "prisma": "^7.10.1"
-  }
+  },
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
 }

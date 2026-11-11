@@ -1,4 +1,5 @@
-const express = require('express');
+const express = require('express')
+const cookieParser = require('cookie-parser')
 const path = require('node:path');
 const { config } = require('dotenv');
 
@@ -6,15 +7,21 @@ config({
   path: path.join(__dirname, '..', '.env'),
 });
 
-const app = express();
-const port = Number(process.env.PORT) || 3000;
+const authRoutes = require('./routes/authRoutes')
 
-app.use(express.json());
+const app = express()
+const port = Number(process.env.PORT);
+
+app.use(express.json())
+app.use(cookieParser())
+app.use('/api/auth', authRoutes)
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+  res.send('Coal Research Project Management API')
+})
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+
+module.exports = app;
