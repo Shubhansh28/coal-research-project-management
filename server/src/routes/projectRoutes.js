@@ -1,6 +1,7 @@
 const express = require('express')
 const {
   add,
+  availableResearchers,
   create,
   details,
   list,
@@ -20,6 +21,7 @@ router.post('/', authenticate, authorizeAdmin, create)
 router.get('/', authenticate, authorizeResearcher, list)
 router.post('/:id/researchers', authenticate, authorizeAdmin, add)
 router.delete('/:id/researchers/:userId', authenticate, authorizeAdmin, remove)
+router.get('/:id/available-researchers', authenticate, authorizeAdmin, availableResearchers)
 router.patch('/:id', authenticate, authorizeAdmin, update)
 router.patch('/:id/status', authenticate, authorizeAdmin, updateStatus)
 router.get('/:id', authenticate, authorizeResearcher, details)

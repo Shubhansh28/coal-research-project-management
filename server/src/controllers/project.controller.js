@@ -3,6 +3,7 @@ const {
   createProject,
   findProjectByCode,
   findProjectForUpdate,
+  getAvailableResearchers,
   getProjectById,
   getProjects,
   removeResearcher,
@@ -114,6 +115,31 @@ const details = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Project could not be loaded.'
+    })
+  }
+}
+
+const availableResearchers = async (req, res) => {
+  try {
+    const researchers = await getAvailableResearchers(req.params.id)
+
+    if (researchers === null) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found.'
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Available researchers fetched successfully.',
+      data: researchers
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({
+      success: false,
+      message: 'Available researchers could not be loaded.'
     })
   }
 }
@@ -341,6 +367,7 @@ const remove = async (req, res) => {
 
 module.exports = {
   add,
+  availableResearchers,
   create,
   details,
   list,

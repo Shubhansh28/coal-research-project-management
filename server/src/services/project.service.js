@@ -50,6 +50,32 @@ const getProjectById = (id, user) => prisma.project.findFirst({
   include: projectDetails
 })
 
+const getAvailableResearchers = async (projectId) => {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { id: true }
+  })
+
+  if (!project) {
+    return null
+  }
+
+  return prisma.user.findMany({
+    where: {
+      role: 'RESEARCHER',
+      assignedProjects: {
+        none: { id: projectId }
+      }
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true
+    },
+    orderBy: { name: 'asc' }
+  })
+}
+
 const updateProject = (id, data) => prisma.project.update({
   where: { id },
   data
@@ -170,6 +196,7 @@ module.exports = {
   createProject,
   findProjectByCode,
   findProjectForUpdate,
+  getAvailableResearchers,
   getProjectById,
   getProjects,
   removeResearcher,
