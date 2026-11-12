@@ -1,9 +1,10 @@
 const express = require('express')
 const {
-  assign,
+  add,
   create,
   details,
   list,
+  remove,
   update,
   updateStatus
 } = require('../controllers/project.controller')
@@ -17,7 +18,8 @@ const router = express.Router()
 
 router.post('/', authenticate, authorizeAdmin, create)
 router.get('/', authenticate, authorizeResearcher, list)
-router.patch('/:id/researchers', authenticate, authorizeAdmin, assign)
+router.post('/:id/researchers', authenticate, authorizeAdmin, add)
+router.delete('/:id/researchers/:userId', authenticate, authorizeAdmin, remove)
 router.patch('/:id', authenticate, authorizeAdmin, update)
 router.patch('/:id/status', authenticate, authorizeAdmin, updateStatus)
 router.get('/:id', authenticate, authorizeResearcher, details)

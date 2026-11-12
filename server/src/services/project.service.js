@@ -83,10 +83,15 @@ const updateProjectStatus = async (id, status) => {
   })
 }
 
-const assignResearchers = async (projectId, researcherIds) => {
+const addResearchers = async (projectId, researcherIds) => {
   const project = await prisma.project.findUnique({
     where: { id: projectId },
-    select: { id: true }
+    select: {
+      id: true,
+      researchers: {
+        select: { id: true }
+      }
+    }
   })
 
   if (!project) {
@@ -105,11 +110,55 @@ const assignResearchers = async (projectId, researcherIds) => {
     return false
   }
 
+  const assignedIds = new Set(project.researchers.map(researcher => researcher.id))
+  const newResearchers = researcherIds
+    .filter(id => !assignedIds.has(id))
+    .map(id => ({ id }))
+
   return prisma.project.update({
     where: { id: projectId },
     data: {
       researchers: {
-        set: researcherIds.map(id => ({ id }))
+        connect: newResearchers
+      }
+    },
+    include: projectDetails
+  })
+}
+
+const removeResearcher = async (projectId, userId) => {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: {
+      id: true,
+      researchers: {
+        select: { id: true }
+      }
+    }
+  })
+
+  if (!project) {
+    return null
+  }
+
+  const researcher = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, role: true }
+  })
+
+  if (!researcher || researcher.role !== 'RESEARCHER') {
+    return false
+  }
+
+  if (!project.researchers.some(assigned => assigned.id === userId)) {
+    return 'NOT_ASSIGNED'
+  }
+
+  return prisma.project.update({
+    where: { id: projectId },
+    data: {
+      researchers: {
+        disconnect: { id: userId }
       }
     },
     include: projectDetails
@@ -117,12 +166,13 @@ const assignResearchers = async (projectId, researcherIds) => {
 }
 
 module.exports = {
-  assignResearchers,
+  addResearchers,
   createProject,
   findProjectByCode,
   findProjectForUpdate,
   getProjectById,
   getProjects,
+  removeResearcher,
   updateProject,
   updateProjectStatus
 }

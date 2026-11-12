@@ -1,10 +1,11 @@
 const {
-  assignResearchers,
+  addResearchers,
   createProject,
   findProjectByCode,
   findProjectForUpdate,
   getProjectById,
   getProjects,
+  removeResearcher,
   updateProject,
   updateProjectStatus
 } = require('../services/project.service')
@@ -257,20 +258,21 @@ const updateStatus = async (req, res) => {
   }
 }
 
-const assign = async (req, res) => {
+const add = async (req, res) => {
   const { researcherIds } = req.body
 
   if (!Array.isArray(researcherIds) ||
+      researcherIds.length === 0 ||
       researcherIds.some(id => typeof id !== 'string') ||
       new Set(researcherIds).size !== researcherIds.length) {
     return res.status(400).json({
       success: false,
-      message: 'Researcher IDs must be a list of unique values.'
+      message: 'Researcher IDs must be a non-empty list of unique values.'
     })
   }
 
   try {
-    const project = await assignResearchers(req.params.id, researcherIds)
+    const project = await addResearchers(req.params.id, researcherIds)
 
     if (project === null) {
       return res.status(404).json({
@@ -299,11 +301,50 @@ const assign = async (req, res) => {
   }
 }
 
+const remove = async (req, res) => {
+  try {
+    const project = await removeResearcher(req.params.id, req.params.userId)
+
+    if (project === null) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found.'
+      })
+    }
+
+    if (project === false) {
+      return res.status(400).json({
+        success: false,
+        message: 'Researcher not found.'
+      })
+    }
+
+    if (project === 'NOT_ASSIGNED') {
+      return res.status(400).json({
+        success: false,
+        message: 'Researcher is not assigned to this project.'
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      project
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({
+      success: false,
+      message: 'Researcher could not be removed.'
+    })
+  }
+}
+
 module.exports = {
-  assign,
+  add,
   create,
   details,
   list,
+  remove,
   update,
   updateStatus
 }
