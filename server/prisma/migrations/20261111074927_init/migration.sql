@@ -94,6 +94,9 @@ CREATE UNIQUE INDEX "Project_projectCode_key" ON "Project"("projectCode");
 CREATE UNIQUE INDEX "Report_projectId_quarter_year_key" ON "Report"("projectId", "quarter", "year");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "FundReport_projectId_quarter_year_key" ON "FundReport"("projectId", "quarter", "year");
+
+-- CreateIndex
 CREATE INDEX "_ProjectResearchers_B_index" ON "_ProjectResearchers"("B");
 
 -- AddForeignKey

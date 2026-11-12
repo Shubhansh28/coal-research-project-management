@@ -86,6 +86,8 @@ model FundReport {
 
   projectId String
   project   Project @relation(fields: [projectId], references: [id])
+
+  @@unique([projectId, quarter, year])
 }
 
 model Document {
