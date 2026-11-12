@@ -43,9 +43,11 @@ CREATE TABLE "Report" (
     "quarter" INTEGER NOT NULL,
     "year" INTEGER NOT NULL,
     "progress" INTEGER NOT NULL,
+    "completedWork" TEXT NOT NULL,
     "remarks" TEXT,
     "status" "Status" NOT NULL DEFAULT 'PENDING',
     "projectId" TEXT NOT NULL,
+    "researcherId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Report_pkey" PRIMARY KEY ("id")
@@ -89,10 +91,16 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "Project_projectCode_key" ON "Project"("projectCode");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Report_projectId_quarter_year_key" ON "Report"("projectId", "quarter", "year");
+
+-- CreateIndex
 CREATE INDEX "_ProjectResearchers_B_index" ON "_ProjectResearchers"("B");
 
 -- AddForeignKey
 ALTER TABLE "Report" ADD CONSTRAINT "Report_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Report" ADD CONSTRAINT "Report_researcherId_fkey" FOREIGN KEY ("researcherId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "FundReport" ADD CONSTRAINT "FundReport_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

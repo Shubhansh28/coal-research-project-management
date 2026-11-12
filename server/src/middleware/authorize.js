@@ -20,7 +20,19 @@ const authorizeResearcher = (req, res, next) => {
   next()
 }
 
+const authorizeResearcherOnly = (req, res, next) => {
+  if (req.user.role !== 'RESEARCHER') {
+    return res.status(403).json({
+      success: false,
+      message: 'Researcher access required.'
+    })
+  }
+
+  next()
+}
+
 module.exports = {
   authorizeAdmin,
-  authorizeResearcher
+  authorizeResearcher,
+  authorizeResearcherOnly
 }

@@ -37,6 +37,7 @@ model User {
   role     Role   @default(RESEARCHER)
 
   assignedProjects Project[] @relation("ProjectResearchers")
+  submittedReports Report[]  @relation("ReportResearcher")
 }
 
 model Project {
@@ -62,13 +63,18 @@ model Report {
   quarter   Int
   year      Int
   progress  Int
+  completedWork String
   remarks   String?
   status    Status   @default(PENDING)
 
   projectId String
   project   Project  @relation(fields: [projectId], references: [id])
+  researcherId String
+  researcher   User   @relation("ReportResearcher", fields: [researcherId], references: [id])
 
   createdAt DateTime @default(now())
+
+  @@unique([projectId, quarter, year])
 }
 
 model FundReport {
