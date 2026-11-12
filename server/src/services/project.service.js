@@ -4,6 +4,20 @@ const createProject = (data) => prisma.project.create({
   data
 })
 
+const findProjectByCode = (projectCode) => prisma.project.findUnique({
+  where: { projectCode },
+  select: { id: true }
+})
+
+const findProjectForUpdate = (id) => prisma.project.findUnique({
+  where: { id },
+  select: {
+    id: true,
+    startDate: true,
+    endDate: true
+  }
+})
+
 const projectDetails = {
   researchers: {
     select: {
@@ -71,6 +85,8 @@ const updateProjectStatus = async (id, status) => {
 
 module.exports = {
   createProject,
+  findProjectByCode,
+  findProjectForUpdate,
   getProjectById,
   getProjects,
   updateProject,

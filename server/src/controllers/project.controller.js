@@ -1,5 +1,7 @@
 const {
   createProject,
+  findProjectByCode,
+  findProjectForUpdate,
   getProjectById,
   getProjects,
   updateProject,
@@ -33,7 +35,23 @@ const create = async (req, res) => {
     })
   }
 
+  if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+    return res.status(400).json({
+      success: false,
+      message: 'End date cannot be earlier than start date.'
+    })
+  }
+
   try {
+    const existingProject = await findProjectByCode(projectCode)
+
+    if (existingProject) {
+      return res.status(409).json({
+        success: false,
+        message: 'A project with this project code already exists.'
+      })
+    }
+
     const project = await createProject({
       title,
       projectCode,
@@ -148,6 +166,41 @@ const update = async (req, res) => {
   }
 
   try {
+    const existingProject = await findProjectForUpdate(req.params.id)
+
+    if (!existingProject) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found.'
+      })
+    }
+
+    if (projectCode !== undefined) {
+      const projectWithCode = await findProjectByCode(projectCode)
+
+      if (projectWithCode && projectWithCode.id !== req.params.id) {
+        return res.status(409).json({
+          success: false,
+          message: 'A project with this project code already exists.'
+        })
+      }
+    }
+
+    const currentStartDate = startDate === undefined
+      ? existingProject.startDate
+      : (startDate ? new Date(startDate) : null)
+    const currentEndDate = endDate === undefined
+      ? existingProject.endDate
+      : (endDate ? new Date(endDate) : null)
+
+    if (currentStartDate && currentEndDate &&
+        currentEndDate < currentStartDate) {
+      return res.status(400).json({
+        success: false,
+        message: 'End date cannot be earlier than start date.'
+      })
+    }
+
     const project = await updateProject(req.params.id, data)
 
     return res.status(200).json({
