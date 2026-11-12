@@ -12,8 +12,7 @@ const create = async (req, res) => {
     quarter,
     year,
     progress,
-    completedWork,
-    remarks
+    completedWork
   } = req.body
 
   if (!projectId || !title || !completedWork ||
@@ -40,8 +39,7 @@ const create = async (req, res) => {
       quarter,
       year,
       progress,
-      completedWork,
-      remarks
+      completedWork
     })
 
     if (report === null) {
