@@ -1,7 +1,8 @@
 const {
   createReport,
   getReportById,
-  getReports
+  getReports,
+  reviewReport
 } = require('../services/report.service')
 
 const create = async (req, res) => {
@@ -127,8 +128,56 @@ const details = async (req, res) => {
   }
 }
 
+const review = async (req, res) => {
+  const { status, remarks } = req.body
+
+  if (!['APPROVED', 'REJECTED'].includes(status)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Review status must be APPROVED or REJECTED.'
+    })
+  }
+
+  if (remarks !== undefined && typeof remarks !== 'string') {
+    return res.status(400).json({
+      success: false,
+      message: 'Remarks must be text.'
+    })
+  }
+
+  try {
+    const report = await reviewReport(req.params.id, status, remarks)
+
+    if (report === null) {
+      return res.status(404).json({
+        success: false,
+        message: 'Report not found.'
+      })
+    }
+
+    if (report === false) {
+      return res.status(400).json({
+        success: false,
+        message: 'This report has already been reviewed.'
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      report
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({
+      success: false,
+      message: 'Report review failed.'
+    })
+  }
+}
+
 module.exports = {
   create,
   details,
-  list
+  list,
+  review
 }

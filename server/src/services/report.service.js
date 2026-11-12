@@ -87,8 +87,33 @@ const getReportById = (id, user) => prisma.report.findFirst({
   include: reportDetails
 })
 
+const reviewReport = async (id, status, remarks) => {
+  const report = await prisma.report.findUnique({
+    where: { id },
+    select: { status: true }
+  })
+
+  if (!report) {
+    return null
+  }
+
+  if (report.status !== 'PENDING') {
+    return false
+  }
+
+  return prisma.report.update({
+    where: { id },
+    data: {
+      status,
+      ...(remarks !== undefined ? { remarks } : {})
+    },
+    include: reportDetails
+  })
+}
+
 module.exports = {
   createReport,
   getReportById,
-  getReports
+  getReports,
+  reviewReport
 }
