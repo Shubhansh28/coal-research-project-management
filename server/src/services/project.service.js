@@ -36,8 +36,43 @@ const getProjectById = (id, user) => prisma.project.findFirst({
   include: projectDetails
 })
 
+const updateProject = (id, data) => prisma.project.update({
+  where: { id },
+  data
+})
+
+const statusTransitions = {
+  PENDING: ['PENDING', 'APPROVED', 'REJECTED'],
+  APPROVED: ['APPROVED', 'COMPLETED'],
+  REJECTED: ['REJECTED', 'PENDING'],
+  COMPLETED: ['COMPLETED']
+}
+
+const updateProjectStatus = async (id, status) => {
+  const project = await prisma.project.findUnique({
+    where: { id },
+    select: { status: true }
+  })
+
+  if (!project) {
+    return null
+  }
+
+  if (!statusTransitions[project.status].includes(status)) {
+    return false
+  }
+
+  return prisma.project.update({
+    where: { id },
+    data: { status },
+    include: projectDetails
+  })
+}
+
 module.exports = {
   createProject,
   getProjectById,
-  getProjects
+  getProjects,
+  updateProject,
+  updateProjectStatus
 }

@@ -1,7 +1,9 @@
 const {
   createProject,
   getProjectById,
-  getProjects
+  getProjects,
+  updateProject,
+  updateProjectStatus
 } = require('../services/project.service')
 
 const create = async (req, res) => {
@@ -47,13 +49,6 @@ const create = async (req, res) => {
       project
     })
   } catch (error) {
-    if (error.code === 'P2002') {
-      return res.status(409).json({
-        success: false,
-        message: 'A project with this project code already exists.'
-      })
-    }
-
     console.error(error)
     return res.status(500).json({
       success: false,
@@ -103,8 +98,115 @@ const details = async (req, res) => {
   }
 }
 
+const update = async (req, res) => {
+  const {
+    title,
+    projectCode,
+    description,
+    fundingType,
+    budget,
+    startDate,
+    endDate
+  } = req.body
+
+  if (fundingType && !['ST', 'RD'].includes(fundingType)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Funding type is invalid.'
+    })
+  }
+
+  if (budget !== undefined && (typeof budget !== 'number' || budget < 0)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Budget is invalid.'
+    })
+  }
+
+  if ((startDate && Number.isNaN(new Date(startDate).getTime())) ||
+      (endDate && Number.isNaN(new Date(endDate).getTime()))) {
+    return res.status(400).json({
+      success: false,
+      message: 'Project date is invalid.'
+    })
+  }
+
+  const data = {}
+  if (title !== undefined) data.title = title
+  if (projectCode !== undefined) data.projectCode = projectCode
+  if (description !== undefined) data.description = description
+  if (fundingType !== undefined) data.fundingType = fundingType
+  if (budget !== undefined) data.budget = budget
+  if (startDate !== undefined) data.startDate = startDate ? new Date(startDate) : null
+  if (endDate !== undefined) data.endDate = endDate ? new Date(endDate) : null
+
+  if (Object.keys(data).length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: 'Provide at least one project field to update.'
+    })
+  }
+
+  try {
+    const project = await updateProject(req.params.id, data)
+
+    return res.status(200).json({
+      success: true,
+      project
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({
+      success: false,
+      message: 'Project update failed.'
+    })
+  }
+}
+
+const updateStatus = async (req, res) => {
+  const { status } = req.body
+
+  if (!['PENDING', 'APPROVED', 'REJECTED', 'COMPLETED'].includes(status)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Project status is invalid.'
+    })
+  }
+
+  try {
+    const project = await updateProjectStatus(req.params.id, status)
+
+    if (project === null) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found.'
+      })
+    }
+
+    if (project === false) {
+      return res.status(400).json({
+        success: false,
+        message: 'Project status transition is not allowed.'
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      project
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({
+      success: false,
+      message: 'Project status update failed.'
+    })
+  }
+}
+
 module.exports = {
   create,
   details,
-  list
+  list,
+  update,
+  updateStatus
 }
