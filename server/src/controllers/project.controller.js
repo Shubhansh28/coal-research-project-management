@@ -1,4 +1,8 @@
-const { createProject } = require('../services/project.service')
+const {
+  createProject,
+  getProjectById,
+  getProjects
+} = require('../services/project.service')
 
 const create = async (req, res) => {
   const {
@@ -58,6 +62,49 @@ const create = async (req, res) => {
   }
 }
 
+const list = async (req, res) => {
+  try {
+    const projects = await getProjects(req.user)
+
+    return res.status(200).json({
+      success: true,
+      projects
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({
+      success: false,
+      message: 'Projects could not be loaded.'
+    })
+  }
+}
+
+const details = async (req, res) => {
+  try {
+    const project = await getProjectById(req.params.id, req.user)
+
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found.'
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      project
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({
+      success: false,
+      message: 'Project could not be loaded.'
+    })
+  }
+}
+
 module.exports = {
-  create
+  create,
+  details,
+  list
 }
