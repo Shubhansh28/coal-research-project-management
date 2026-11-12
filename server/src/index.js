@@ -8,6 +8,7 @@ config({
 });
 
 const authRoutes = require('./routes/authRoutes')
+const projectRoutes = require('./routes/projectRoutes')
 
 const app = express()
 const port = Number(process.env.PORT);
@@ -15,6 +16,7 @@ const port = Number(process.env.PORT);
 app.use(express.json())
 app.use(cookieParser())
 app.use('/api/auth', authRoutes)
+app.use('/api/projects', projectRoutes)
 
 app.get('/', (req, res) => {
   res.send('Coal Research Project Management API')
