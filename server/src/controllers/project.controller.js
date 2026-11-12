@@ -1,4 +1,5 @@
 const {
+  assignResearchers,
   createProject,
   findProjectByCode,
   findProjectForUpdate,
@@ -256,7 +257,50 @@ const updateStatus = async (req, res) => {
   }
 }
 
+const assign = async (req, res) => {
+  const { researcherIds } = req.body
+
+  if (!Array.isArray(researcherIds) ||
+      researcherIds.some(id => typeof id !== 'string') ||
+      new Set(researcherIds).size !== researcherIds.length) {
+    return res.status(400).json({
+      success: false,
+      message: 'Researcher IDs must be a list of unique values.'
+    })
+  }
+
+  try {
+    const project = await assignResearchers(req.params.id, researcherIds)
+
+    if (project === null) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found.'
+      })
+    }
+
+    if (project === false) {
+      return res.status(400).json({
+        success: false,
+        message: 'One or more researcher IDs are invalid.'
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      project
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({
+      success: false,
+      message: 'Researchers could not be assigned.'
+    })
+  }
+}
+
 module.exports = {
+  assign,
   create,
   details,
   list,

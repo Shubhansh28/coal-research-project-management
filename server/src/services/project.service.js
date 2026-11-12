@@ -83,7 +83,41 @@ const updateProjectStatus = async (id, status) => {
   })
 }
 
+const assignResearchers = async (projectId, researcherIds) => {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { id: true }
+  })
+
+  if (!project) {
+    return null
+  }
+
+  const researchers = await prisma.user.findMany({
+    where: {
+      id: { in: researcherIds },
+      role: 'RESEARCHER'
+    },
+    select: { id: true }
+  })
+
+  if (researchers.length !== researcherIds.length) {
+    return false
+  }
+
+  return prisma.project.update({
+    where: { id: projectId },
+    data: {
+      researchers: {
+        set: researcherIds.map(id => ({ id }))
+      }
+    },
+    include: projectDetails
+  })
+}
+
 module.exports = {
+  assignResearchers,
   createProject,
   findProjectByCode,
   findProjectForUpdate,

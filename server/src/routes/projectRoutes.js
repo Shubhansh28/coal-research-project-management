@@ -1,5 +1,6 @@
 const express = require('express')
 const {
+  assign,
   create,
   details,
   list,
@@ -16,6 +17,7 @@ const router = express.Router()
 
 router.post('/', authenticate, authorizeAdmin, create)
 router.get('/', authenticate, authorizeResearcher, list)
+router.patch('/:id/researchers', authenticate, authorizeAdmin, assign)
 router.patch('/:id', authenticate, authorizeAdmin, update)
 router.patch('/:id/status', authenticate, authorizeAdmin, updateStatus)
 router.get('/:id', authenticate, authorizeResearcher, details)
