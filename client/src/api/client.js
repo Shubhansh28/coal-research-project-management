@@ -69,12 +69,34 @@ export const api = {
 };
 
 /**
- * Authentication API methods
+ * Authentication API endpoints
  */
 export const authApi = {
   signup: (payload) => api.post('/api/auth/signup', payload),
   login: (payload) => api.post('/api/auth/login', payload),
   me: () => api.get('/api/auth/me'),
+};
+
+/**
+ * Dashboard API endpoints
+ */
+export const dashboardApi = {
+  getAdmin: () => api.get('/api/dashboard'),
+  getResearcher: () => api.get('/api/dashboard/researcher'),
+};
+
+/**
+ * Projects API endpoints
+ */
+export const projectsApi = {
+  list: () => api.get('/api/projects'),
+  getById: (id) => api.get(`/api/projects/${id}`),
+  create: (data) => api.post('/api/projects', data),
+  update: (id, data) => api.patch(`/api/projects/${id}`, data),
+  updateStatus: (id, status) => api.patch(`/api/projects/${id}/status`, { status }),
+  getAvailableResearchers: (id) => api.get(`/api/projects/${id}/available-researchers`),
+  assignResearchers: (id, researcherIds) => api.post(`/api/projects/${id}/researchers`, { researcherIds }),
+  removeResearcher: (id, userId) => api.delete(`/api/projects/${id}/researchers/${userId}`),
 };
 
 export default api;
