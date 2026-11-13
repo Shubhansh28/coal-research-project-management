@@ -56,6 +56,15 @@ const getAdminDashboard = async () => {
       financialSummary.totalAmountSpent += fundReport.amountSpent
     })
 
+    const amountReceived = project.fundReports.reduce(
+      (total, fundReport) => total + fundReport.amountReceived,
+      0
+    )
+    const amountSpent = project.fundReports.reduce(
+      (total, fundReport) => total + fundReport.amountSpent,
+      0
+    )
+
     const latestReport = project.reports[0]
 
     return {
@@ -64,6 +73,8 @@ const getAdminDashboard = async () => {
       projectCode: project.projectCode,
       status: project.status,
       budget: project.budget,
+      amountReceived,
+      amountSpent,
       latestReport: latestReport
         ? {
             quarter: latestReport.quarter,
