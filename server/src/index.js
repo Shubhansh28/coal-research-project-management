@@ -1,4 +1,5 @@
 const express = require('express')
+const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const path = require('node:path');
 const { config } = require('dotenv');
@@ -13,12 +14,18 @@ const documentRoutes = require('./routes/documentRoutes')
 const fundReportRoutes = require('./routes/fundReportRoutes')
 const projectRoutes = require('./routes/projectRoutes')
 const reportRoutes = require('./routes/reportRoutes')
+const originAuth = require('./middleware/origin')
 
 const app = express()
 const port = Number(process.env.PORT);
 
+app.use(cors({
+  origin: process.env.CLIENT_ORIGIN || false,
+  credentials: true
+}))
 app.use(express.json())
 app.use(cookieParser())
+// app.use(originAuth)
 app.use('/api/auth', authRoutes)
 app.use('/api/dashboard', dashboardRoutes)
 app.use('/api', documentRoutes)
