@@ -8,6 +8,7 @@ config({
 });
 
 const authRoutes = require('./routes/authRoutes')
+const documentRoutes = require('./routes/documentRoutes')
 const fundReportRoutes = require('./routes/fundReportRoutes')
 const projectRoutes = require('./routes/projectRoutes')
 const reportRoutes = require('./routes/reportRoutes')
@@ -18,6 +19,7 @@ const port = Number(process.env.PORT);
 app.use(express.json())
 app.use(cookieParser())
 app.use('/api/auth', authRoutes)
+app.use('/api', documentRoutes)
 app.use('/api/fund-reports', fundReportRoutes)
 app.use('/api/projects', projectRoutes)
 app.use('/api/reports', reportRoutes)
