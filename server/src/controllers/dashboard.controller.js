@@ -1,4 +1,7 @@
-const { getAdminDashboard } = require('../services/dashboard.service')
+const {
+  getAdminDashboard,
+  getResearcherDashboard
+} = require('../services/dashboard.service')
 
 const admin = async (req, res) => {
   try {
@@ -17,6 +20,27 @@ const admin = async (req, res) => {
   }
 }
 
+const researcher = async (req, res) => {
+  try {
+    const projects = await getResearcherDashboard(req.user)
+
+    return res.status(200).json({
+      success: true,
+      dashboard: {
+        totalProjects: projects.length,
+        projects
+      }
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({
+      success: false,
+      message: 'Researcher dashboard could not be loaded.'
+    })
+  }
+}
+
 module.exports = {
-  admin
+  admin,
+  researcher
 }

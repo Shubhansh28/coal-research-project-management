@@ -96,6 +96,53 @@ const getAdminDashboard = async () => {
   }
 }
 
+const getResearcherDashboard = (user) => prisma.project.findMany({
+  where: user.role === 'RESEARCHER'
+    ? { researchers: { some: { id: user.id } } }
+    : undefined,
+  select: {
+    id: true,
+    title: true,
+    projectCode: true,
+    status: true,
+    startDate: true,
+    endDate: true,
+    reports: {
+      orderBy: { createdAt: 'desc' },
+      take: 1,
+      select: {
+        quarter: true,
+        year: true,
+        progress: true,
+        status: true,
+        createdAt: true
+      }
+    }
+  },
+  orderBy: { title: 'asc' }
+}).then(projects => projects.map(project => {
+  const latestReport = project.reports[0]
+
+  return {
+    id: project.id,
+    title: project.title,
+    projectCode: project.projectCode,
+    status: project.status,
+    startDate: project.startDate,
+    endDate: project.endDate,
+    latestReport: latestReport
+      ? {
+          quarter: latestReport.quarter,
+          year: latestReport.year,
+          progress: latestReport.progress,
+          status: latestReport.status,
+          submittedAt: latestReport.createdAt
+        }
+      : null
+  }
+}))
+
 module.exports = {
-  getAdminDashboard
+  getAdminDashboard,
+  getResearcherDashboard
 }
