@@ -22,7 +22,7 @@ const verifyToken = (token) => {
 
 const getAuthCookieOptions = () => ({
   httpOnly: true,
-  secure: process.env.NODE_ENV,
+  secure: process.env.NODE_ENV==="production",
   sameSite: process.env.COOKIE_SAME_SITE,
   maxAge: 15 * 60 * 1000,
   path: '/'
