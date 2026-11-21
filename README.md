@@ -1,5 +1,8 @@
 # Coal Research Project Monitoring System (S&T / R&D)
 
+Deployed Backened Link - https://coal-research-project-management.onrender.com/
+Deployed Frontend Link - 
+
 [![React](https://img.shields.io/badge/React-19.x-blue.svg?logo=react)](https://react.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.x-38B2AC.svg?logo=tailwind-css)](https://tailwindcss.com/)
 [![Vite](https://img.shields.io/badge/Vite-v8.x-646CFF.svg?logo=vite)](https://vitejs.dev/)

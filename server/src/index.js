@@ -19,8 +19,32 @@ const originAuth = require('./middleware/origin')
 const app = express()
 const port = Number(process.env.PORT);
 
+app.set('trust proxy', 1);
+
+const clientOrigin = process.env.CLIENT_ORIGIN;
+const allowedOrigins = clientOrigin
+  ? clientOrigin.split(',').map((o) => o.trim()).filter(Boolean)
+  : ['http://localhost:5173'];
+
 app.use(cors({
-  origin: process.env.CLIENT_ORIGIN || false,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      return callback(null, true);
+    }
+
+    try {
+      const hostname = new URL(origin).hostname;
+      if (hostname.endsWith('.vercel.app') && (allowedOrigins.some((o) => o.includes('vercel.app')) || process.env.NODE_ENV === 'production')) {
+        return callback(null, true);
+      }
+    } catch {
+      // Invalid URL format
+    }
+
+    return callback(null, false);
+  },
   credentials: true
 }))
 app.use(express.json())

@@ -9,6 +9,7 @@ import Signup from './pages/auth/Signup';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ResearcherDashboard from './pages/researcher/ResearcherDashboard';
 import ProjectsList from './pages/projects/ProjectsList';
+import ProjectDetails from './pages/projects/ProjectDetails';
 import ReportsList from './pages/reports/ReportsList';
 import FundTracker from './pages/funds/FundTracker';
 import { Loader2 } from 'lucide-react';
@@ -78,6 +79,7 @@ export default function App() {
 
             {/* Shared Authenticated Routes */}
             <Route path="/projects" element={<ProjectsList />} />
+            <Route path="/projects/:id" element={<ProjectDetails />} />
             <Route path="/reports" element={<ReportsList />} />
             <Route path="/funds" element={<FundTracker />} />
           </Route>

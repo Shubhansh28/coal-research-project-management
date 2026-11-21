@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL !== undefined 
+  ? import.meta.env.VITE_API_BASE_URL 
+  : '';
 
 /**
  * Custom error class for API responses
@@ -97,6 +99,49 @@ export const projectsApi = {
   getAvailableResearchers: (id) => api.get(`/api/projects/${id}/available-researchers`),
   assignResearchers: (id, researcherIds) => api.post(`/api/projects/${id}/researchers`, { researcherIds }),
   removeResearcher: (id, userId) => api.delete(`/api/projects/${id}/researchers/${userId}`),
+};
+
+/**
+ * Documents API endpoints
+ */
+export const documentsApi = {
+  listByProject: (projectId) => api.get(`/api/projects/${projectId}/documents`),
+  create: (projectId, data) => api.post(`/api/projects/${projectId}/documents`, data),
+  getById: (id) => api.get(`/api/documents/${id}`),
+  delete: (id) => api.delete(`/api/documents/${id}`),
+};
+
+/**
+ * Reports API endpoints
+ */
+export const reportsApi = {
+  list: (params = {}) => {
+    const query = new URLSearchParams();
+    if (params.projectId) query.append('projectId', params.projectId);
+    if (params.quarter !== undefined && params.quarter !== '' && params.quarter !== 'ALL') query.append('quarter', params.quarter);
+    if (params.year !== undefined && params.year !== '' && params.year !== 'ALL') query.append('year', params.year);
+    const queryString = query.toString();
+    return api.get(`/api/reports${queryString ? `?${queryString}` : ''}`);
+  },
+  getById: (id) => api.get(`/api/reports/${id}`),
+  create: (data) => api.post('/api/reports', data),
+  review: (id, { status, remarks }) => api.patch(`/api/reports/${id}/review`, { status, remarks }),
+};
+
+/**
+ * Fund Reports API endpoints
+ */
+export const fundReportsApi = {
+  list: (params = {}) => {
+    const query = new URLSearchParams();
+    if (params.projectId) query.append('projectId', params.projectId);
+    if (params.quarter !== undefined && params.quarter !== '' && params.quarter !== 'ALL') query.append('quarter', params.quarter);
+    if (params.year !== undefined && params.year !== '' && params.year !== 'ALL') query.append('year', params.year);
+    const queryString = query.toString();
+    return api.get(`/api/fund-reports${queryString ? `?${queryString}` : ''}`);
+  },
+  getById: (id) => api.get(`/api/fund-reports/${id}`),
+  create: (data) => api.post('/api/fund-reports', data),
 };
 
 export default api;
