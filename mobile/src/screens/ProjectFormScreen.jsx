@@ -1,0 +1,17 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Text } from 'react-native';
+import { Button, Menu } from 'react-native-paper';
+import { projectsApi } from '../api/client';
+import { Field, Screen, SectionTitle, styles } from '../components/common';
+import { getErrorMessage } from '../utils/errors';
+export default function ProjectFormScreen() {
+  const { id } = useLocalSearchParams(); const editing = Boolean(id); const client = useQueryClient(); const existing = useQuery({ queryKey: ['project', id], queryFn: async () => (await projectsApi.get(id)).data.project, enabled: editing }); const item = existing.data; const [title, setTitle] = useState(''); const [code, setCode] = useState(''); const [description, setDescription] = useState(''); const [fundingType, setFundingType] = useState('ST'); const [budget, setBudget] = useState(''); const [startDate, setStartDate] = useState(''); const [endDate, setEndDate] = useState(''); const [menu, setMenu] = useState(false);
+  useEffect(() => { if (item?.fundingType) setFundingType(item.fundingType); }, [item?.fundingType]);
+  const values = { title: title || item?.title || '', projectCode: code || item?.projectCode || '', description: description || item?.description || '', fundingType, budget: budget || String(item?.budget || ''), startDate: startDate || (item?.startDate ? item.startDate.slice(0, 10) : ''), endDate: endDate || (item?.endDate ? item.endDate.slice(0, 10) : '') };
+  const mutation = useMutation({ mutationFn: () => editing ? projectsApi.update(id, values) : projectsApi.create({ ...values, budget: Number(values.budget), description: values.description || undefined, startDate: values.startDate || undefined, endDate: values.endDate || undefined }), onSuccess: () => { client.invalidateQueries({ queryKey: ['projects'] }); router.replace(editing ? `/(admin)/projects/${id}` : '/(admin)/projects'); } });
+  if (editing && existing.isLoading) return null;
+  const valid = values.title && values.projectCode && values.budget !== '' && Number(values.budget) >= 0;
+  return <Screen><SectionTitle>{editing ? 'Edit project' : 'Create project'}</SectionTitle><Field label="Title" value={values.title} onChangeText={setTitle} /><Field label="Project code" value={values.projectCode} onChangeText={setCode} autoCapitalize="characters" /><Field label="Description" value={values.description} onChangeText={setDescription} multiline /><Menu visible={menu} onDismiss={() => setMenu(false)} anchor={<Button mode="outlined" onPress={() => setMenu(true)}>Funding type: {values.fundingType}</Button>}><Menu.Item title="ST" onPress={() => { setFundingType('ST'); setMenu(false); }} /><Menu.Item title="RD" onPress={() => { setFundingType('RD'); setMenu(false); }} /></Menu><Field label="Budget" value={values.budget} onChangeText={setBudget} keyboardType="decimal-pad" /><Field label="Start date (YYYY-MM-DD)" value={values.startDate} onChangeText={setStartDate} /><Field label="End date (YYYY-MM-DD)" value={values.endDate} onChangeText={setEndDate} /><Button mode="contained" disabled={!valid || mutation.isPending} loading={mutation.isPending} onPress={() => mutation.mutate()}>{editing ? 'Save changes' : 'Create project'}</Button>{mutation.isError && <Text style={styles.error}>{getErrorMessage(mutation.error, 'Project could not be saved.')}</Text>}</Screen>;
+}
